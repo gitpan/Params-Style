@@ -1,0 +1,11 @@
+# $Id: Changes,v 1.3 2003/06/25 13:08:59 mrodrigu Exp $
+
+Revision history for Perl extension Params::Style.
+
+0.02  2003-06-24
+    - added tied hash interface (suggestion of Bill Ward)
+
+0.01  2003-06-23
+	- original version; created by h2xs 1.22 with options
+		-X -n Params::Style
+
