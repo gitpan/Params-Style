@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name: Params-Style
-version: 0.03
+version: 0.04
 license: perl
 distribution_type: module
 requires:
@@ -10,5 +10,8 @@ requires:
 recommends: {}
 build_requires: {}
 conflicts: {}
-provides: {}
+provides:
+  Params::Style:
+    file: lib/Params/Style.pm
+    version: 0.04
 generated_by: Module::Build version 0.19

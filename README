@@ -1,7 +1,7 @@
 Params::Style 
 =============================
 
-$Id: README,v 1.1.1.1 2003/12/05 16:35:39 mrodrigu Exp $
+$Id: README,v 1.2 2003/12/08 01:47:13 mrodrigu Exp $
 
 NAME
 
@@ -21,8 +21,9 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Module::Build to install
-  Test::More    for test
+  Attribute::Handlers
+  Module::Build        to install
+  Test::More           for testing
 
 COPYRIGHT AND LICENCE
 

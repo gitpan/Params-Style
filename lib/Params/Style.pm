@@ -23,7 +23,7 @@ use vars qw( @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION);
                &perl_style_params, &javaStyleParams, &JavaStyleParams
              );
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 
 my( $uc, $UC);
