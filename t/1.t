@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w 
 
-# $Id: 1.t,v 1.3 2003/06/25 13:09:08 mrodrigu Exp $
+# $Id: 1.t,v 1.1.1.1 2003/12/05 16:35:39 mrodrigu Exp $
 
 use strict;
 use Data::Dumper;
@@ -55,7 +55,8 @@ BEGIN
   }
 
 use Test::More tests => $test_nb;
-BEGIN { use_ok('Params::Style', qw(:all)) };
+use Params::Style qw(:all);
+ok(1);
 
 foreach (@test_array)
   { my( $input, $lc_expected, $cc_expected, $name)= split /\s*:\s*/;

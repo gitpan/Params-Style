@@ -1,9 +1,10 @@
 package Params::Style;
 
-# $Id: Style.pm,v 1.3 2003/06/25 13:09:08 mrodrigu Exp $
+# $Id: Style.pm,v 1.4 2003/12/05 17:50:04 mrodrigu Exp $
 
 use strict;
 use warnings;
+use Carp;
 
 require Exporter;
 
@@ -15,16 +16,14 @@ use vars qw( @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Params::Style ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
+# This allows declaration use Params::Style ':all';
 %EXPORT_TAGS = ( all => [ qw( &perl_style_params &javaStyleParams &JavaStyleParams &replace_keys) ] );
 
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} },  &replace_keys,
                &perl_style_params, &javaStyleParams, &JavaStyleParams
-	         );
+             );
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 
 my( $uc, $UC);
@@ -34,7 +33,7 @@ BEGIN
                        $UC  = qr/\P{UppercaseLetter}/;
                      }
     else             { $uc= qr/[A-Z]/; 
-                       $UC= qr/[^A-Z]/;	
+                       $UC= qr/[^A-Z]/;
                      }
   }
 
@@ -46,32 +45,32 @@ BEGIN
 
 sub replace_keys
   { my $replace_keys = shift; # sub call to use on each key
-	if( @_ == 1)
-	  { # should be a reference
-		my $options= shift @_;
-		if( UNIVERSAL::isa( $options, 'ARRAY'))
-		  { if( scalar @$options % 2) { carp_odd_arg_nb(); }
+    if( @_ == 1)
+      { # should be a reference
+        my $options= shift @_;
+        if( UNIVERSAL::isa( $options, 'ARRAY'))
+          { if( scalar @$options % 2) { carp_odd_arg_nb(); }
             my @options; my $flip= 0;
-			foreach (@$options)
-			  {  if($flip=1-$flip) { push @options, $replace_keys->( $_); }
-				  else             { push @options, $_;              } 
+            foreach (@$options)
+              { if( $flip=1-$flip) { push @options, $replace_keys->( $_); }
+                else               { push @options, $_;              } 
               }
-			return \@options;
+            return \@options;
           }
-		elsif( UNIVERSAL::isa( $options, 'HASH'))
-		  { my %options= map { $replace_keys->($_) => $options->{$_} } keys %$options;
-		    return \%options;
-		  }
-		else
-		  { carp_wrong_arg_type( ref $options); }
-		    
-      }
-	else
+        elsif( UNIVERSAL::isa( $options, 'HASH'))
+          { my %options= map { $replace_keys->($_) => $options->{$_} } keys %$options;
+            return \%options;
+          }
+        else
+          { carp_wrong_arg_type( ref $options); }
+    
+          }
+    else
       { my @options;
         while( my $key= shift @_) { push @options, $replace_keys->( $key), shift( @_); }
-	    return @options;
+        return @options;
       }
-  }	
+  }
 
 sub perl_style_params { return replace_keys( \&perl_style, @_); }
 sub javaStyleParams   { return replace_keys( \&javaStyle, @_); }
@@ -90,10 +89,10 @@ sub JavaStyle { my $name= shift; $name=~ s{(?:_|^)(\w)}{\U$1}g; return $name; }
 sub perl_style
   { my $name= shift;
     return $name if( $name=~ m{_});
-	$name=~ s{(?<!_)($uc)($UC)}{_\L$1$2}g;
-	$name=~ s{(?<!_|$uc)($uc+)}{_$1}g;
-	$name=~ s{_($uc)$}{_\L$1};
-	$name=~ s{^_}{};
+    $name=~ s{(?<!_)($uc)($UC)}{_\L$1$2}g;
+    $name=~ s{(?<!_|$uc)($uc+)}{_$1}g;
+    $name=~ s{_($uc)$}{_\L$1};
+    $name=~ s{^_}{};
     return $name;
   }
     
@@ -108,7 +107,7 @@ sub carp_wrong_arg_type
     my $pn_sub= (caller(2))[3];
     my ($package, $filename, $line)= (caller(3))[0..2];
     warn "wrong arguments type $type passed to $pn_sub at $filename line $line ",
-         "should be array, array ref or hash ref\n";
+         "should be hash, hashref, array or array ref\n";
   }
   
 ################################################################
@@ -120,13 +119,16 @@ sub carp_wrong_arg_type
 my $replace_keys;
 my %replace_func;
 
-require Tie::Hash;
+use Attribute::Handlers autotie => { '__CALLER__::ParamsStyle' => __PACKAGE__ };
+
+use vars qw(@ISA);
+use Tie::Hash;
 unshift @ISA, 'Tie::StdHash';
 
 BEGIN
-  { %replace_func= ( perl_style => \&perl_style,
-                     javaStyle  => \&javaStyle,
-					 JavaStyle  => \&JavaStyle,
+  { %replace_func= ( perl_style => \&Params::Style::perl_style,
+                     javaStyle  => \&Params::Style::javaStyle,
+                     JavaStyle  => \&Params::Style::JavaStyle,
                    );
   }
 
@@ -134,16 +136,17 @@ sub TIEHASH
   { my( $class, $style)= @_;
     if( UNIVERSAL::isa( $style, 'CODE'))
       { $replace_keys= $style; }
-	else
-	  { $replace_keys= $replace_func{$style}
-	      or die "wrong style $style\n";
+    else
+      { $replace_keys= $replace_func{$style}
+        or die "wrong style $style\n";
       } 
-	return bless {}, $class;
+    return bless {}, $class;
   }
+
 
 sub STORE
   { my( $hash, $key, $value)= @_;
-	$hash->{$replace_keys->($key)}= $value;
+    $hash->{$replace_keys->($key)}= $value;
   }
 
 sub EXISTS
@@ -166,12 +169,21 @@ perl_style or javaStyle
   ...
   sub my_sub
     { my( $arg, @opts)= @_;
-	  my %opts= perl_style_params( @opts); 
+      my %opts= perl_style_params( @opts); 
       # %opts is now:
-	  # camel_case_option => 'fooBar',
-	  # hideous_IMHO      => 1,
-	  # bad_BAD_bad       => 'foo'
+      # camel_case_option => 'fooBar',
+      # hideous_IMHO      => 1,
+      # bad_BAD_bad       => 'foo'
       ...
+    }
+
+  or
+
+  sub my_sub
+    { my $arg= shift;
+      my %opts : ParamsStyle( 'perl_style')= @_;
+      ...
+    }
 
 =head1 ABSTRACT
 
@@ -223,16 +235,14 @@ Exports perl_style_params, javaStyleParams, JavaStyleParams and replace_keys
 
 =back
 
-=head2 Tied Hash interface
+=head2 Autotied hash interface
 
-Instead of calling a function it is also possible to use a tied hash, in which
+Instead of calling a function it is also possible to use an autotied hash, in which
 all the keys will be converted to the proper style:
 
   sub foo
-    { my %params;
-      tie %params, 'Params::Style', 'perl_style';
-      %params= @_;
-	}
+    { my %params: ParamStyle( 'perl_style')= @_;
+    }
 
 The extra parameter to C<tie> is either the name of a style (C<perl_style>,
 C<javaStyle> or C<JavaStyle>) or a code reference, that will be applied to
