@@ -1,17 +1,17 @@
 --- #YAML:1.0
 name: Params-Style
-version: 0.04
+version: 0.05
+author:
+  - Michel Rodriguez, E<lt>mirod@cpan.orgE<gt>
+abstract: ~
 license: perl
-distribution_type: module
 requires:
-  Attribute::Handlers: 0
-  Test::More: 0
+  Attribute::Handlers: 0.78
+  Test::More: 0.5
   Tie::Hash: 0
-recommends: {}
-build_requires: {}
-conflicts: {}
+  perl: 5.6.1
 provides:
   Params::Style:
     file: lib/Params/Style.pm
-    version: 0.04
-generated_by: Module::Build version 0.19
+    version: 0.05
+generated_by: Module::Build version 0.2611

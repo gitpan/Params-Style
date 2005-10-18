@@ -1,12 +1,14 @@
-# $Id: Build.PL,v 1.3 2003/12/05 17:50:04 mrodrigu Exp $
+# $Id: Build.PL,v 1.4 2005/10/18 09:41:04 mrodrigu Exp $
 use Module::Build;
 
-Module::Build->new
+my $build= Module::Build->new
       ( module_name => 'Params::Style',
         license => 'perl',
-        requires => { Test::More          => 0,
-                      Attribute::Handlers => 0,
+        requires => { perl => '5.6.1',
+                      Test::More          => 0.50,
+                      Attribute::Handlers => 0.78,
                       Tie::Hash           => 0,
                     },
-      )->create_build_script;
+      );
+$build->create_build_script;
 

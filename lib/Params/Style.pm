@@ -23,7 +23,7 @@ use vars qw( @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT $VERSION);
                &perl_style_params, &javaStyleParams, &JavaStyleParams
              );
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 
 my( $uc, $UC);
@@ -49,7 +49,7 @@ sub replace_keys
       { # should be a reference
         my $options= shift @_;
         if( UNIVERSAL::isa( $options, 'ARRAY'))
-          { if( scalar @$options % 2) { carp_odd_arg_nb(); }
+          { if( scalar @$options % 2) { _carp_odd_arg_nb(); }
             my @options; my $flip= 0;
             foreach (@$options)
               { if( $flip=1-$flip) { push @options, $replace_keys->( $_); }
@@ -62,7 +62,7 @@ sub replace_keys
             return \%options;
           }
         else
-          { carp_wrong_arg_type( ref $options); }
+          { _carp_wrong_arg_type( ref $options); }
     
           }
     else
@@ -96,13 +96,13 @@ sub perl_style
     return $name;
   }
     
-sub carp_odd_arg_nb
+sub _carp_odd_arg_nb
   { my $pn_sub= (caller(2))[3];
     my ($package, $filename, $line)= (caller(3))[0..2];
     warn "odd number of arguments passed to $pn_sub at $filename line $line\n";
   }
   
-sub carp_wrong_arg_type
+sub _carp_wrong_arg_type
   { my $type= shift;
     my $pn_sub= (caller(2))[3];
     my ($package, $filename, $line)= (caller(3))[0..2];
@@ -221,6 +221,24 @@ Converts the keys of C<< <params> >> into JavaStyle keys
 
 Applies C<< <coderef> >> to the keys in C<< <params> >>
 
+The following filters are already defined:
+
+=over 4
+
+=item JavaStyle
+
+used by JavaStyleParams
+
+=item javaStyle
+
+used by javaStyleParams
+
+=item perl_style
+
+used by perl_style_params
+
+=back
+
 =back
 
 =head2 EXPORT
@@ -242,6 +260,7 @@ all the keys will be converted to the proper style:
 
   sub foo
     { my %params: ParamStyle( 'perl_style')= @_;
+      ...
     }
 
 The extra parameter to C<tie> is either the name of a style (C<perl_style>,
