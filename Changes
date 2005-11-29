@@ -1,6 +1,10 @@
-# $Id: Changes,v 1.4 2005/10/18 09:41:04 mrodrigu Exp $
+# $Id: Changes,v 1.5 2005/11/29 12:09:10 mrodrigu Exp $
 
 Revision history for Perl extension Params::Style.
+
+0.06 2005-11-28
+    - added pod tests to MANIFEST (duh!)
+    - added the nostyle style (nostypeparams)
 
 0.05 2005-10-18
     - doc fixes, added pod and pod coverage tests

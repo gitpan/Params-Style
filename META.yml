@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name: Params-Style
-version: 0.05
+version: 0.06
 author:
   - Michel Rodriguez, E<lt>mirod@cpan.orgE<gt>
 abstract: ~
@@ -13,5 +13,5 @@ requires:
 provides:
   Params::Style:
     file: lib/Params/Style.pm
-    version: 0.05
+    version: 0.06
 generated_by: Module::Build version 0.2611

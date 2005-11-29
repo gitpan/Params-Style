@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w 
 
-# $Id: 1.t,v 1.1.1.1 2003/12/05 16:35:39 mrodrigu Exp $
+# $Id: 1.t,v 1.2 2005/11/29 12:09:10 mrodrigu Exp $
 
 use strict;
 use Data::Dumper;
 
-my( @test_array, @cc_test, @test_refs, @test_tied, @test_warnings, $test_nb);
+my( @test_array, @cc_test, @test_refs, @test_tied, @test_warnings, @test_code, $test_nb);
 
 BEGIN
   { @cc_test=( q{toTOTo    => to_TO_to},
@@ -25,7 +25,7 @@ BEGIN
                q{abDeGh => ab_de_gh}, q{ABDeGh => AB_de_gh}, q{abDEGh => ab_DE_gh}, q{abDeGH => ab_de_GH},
              );
 
-    @test_array=(
+    @test_array= (
     q{toto => foo              :                          :                          : 1 param, simple, lc},
     q{toto => Foo              : toto => Foo              :                          : 1 param, simple, lc},
     q{toto_tata => foo_bar     :                          : totoTata => foo_bar      : 1 param, 2words, lc},
@@ -51,7 +51,15 @@ BEGIN
     q{AbCdE => ABCdE, AbCd => abcd, AbC => 1 : ab_cd_e => ABCdE, ab_cd => abcd, ab_c => 1 : refs long2},
     );
 
-     $test_nb= 1 + (2 * @test_array) + @cc_test + ( 2 * @test_refs) + @test_tied + @test_warnings;    
+    @test_code= (
+    q{fooXMLBar   => fooXMLBar  : foo_XML_bar => fooXMLBar   : accronym and caps},
+    q{foo_XML_bar => fooXMLBar  : foo_XML_bar => fooXMLBar   : already ok},
+    q{foo_xml_bar => fooXMLBar  : foo_XML_bar => fooXMLBar   : ok but accronym in uc},
+    q{fooXMLABar  => fooXMLABar : foo_xmla_bar => fooXMLABar : nearly an accronym caps},
+    );
+       
+
+     $test_nb= 1 + (2 * @test_array) + @cc_test + ( 2 * @test_refs) + @test_tied + @test_warnings + @test_code;    
   }
 
 use Test::More tests => $test_nb;
@@ -110,6 +118,28 @@ foreach (@test_tied)
     
   }
 
+foreach (@test_code)
+  { my( $input, $expected, $name)= split /\s*:\s*/;
+    my @input       = split /\s*(?:=>|,)\s*/, $input;
+    my %expected    = split /\s*(?:=>|,)\s*/ => $expected;
+
+    my %result= replace_keys( \&code, @input);
+    ok( eq_hash( \%result, \%expected), "code $name")
+      or diag( display( 'code', \@input, \%result, \%expected) );
+  }
+
+
+exit;
+ 
+sub code
+  { my( $string)= @_;
+    my %uc= map { $_ => 1 } qw( XML);
+    my @parts;
+    while( $string=~ s{^_?([a-z]+|[A-Z][a-z]+|[A-Z]+)(?=[A-Z_]|$)}{}) { push @parts, $1; }
+    @parts= map { $uc{uc()} ? uc : lc } @parts;
+    return join( _ => @parts);
+  }
+ 
 
 sub display
   { my( $func, $input, $result, $expected)= @_;
